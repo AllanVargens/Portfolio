@@ -1,0 +1,10 @@
+fastapi~=0.104.1
+uvicorn
+pymongo~=4.6.1
+pydantic~=2.5.2
+requests
+pytest
+pytest-asyncio
+HTTPX
+'passlib[bcrypt]'
+'fastapi-jwt-auth[asymmetric]'

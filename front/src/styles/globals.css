@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Almarai&display=swap');
+
+:root {
+  --blue-100: #C6CAEB;
+  --blue-200: #9AA0C8;
+  --blue-300: #737BA5;
+  --blue-400: #515A82;
+  --blue-500: #253D60;
+  --blue-600: #1D243D;
+  --blue-800: #0A0E1A;
+
+  --gradient: linear-gradient(270deg, #592FD0, #67C8FF);
+}
+
+*{
+  padding: 0;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box
+}
+
+html, body {
+  font-family: 'Almarai', sans-serif;
+}
+

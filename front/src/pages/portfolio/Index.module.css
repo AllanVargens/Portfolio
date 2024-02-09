@@ -1,0 +1,80 @@
+.container{
+    width: 70%;
+    margin:0 auto;
+    display: flex;
+    flex-direction: row;
+
+}
+
+.containerInfo{
+    width: 70%;
+    margin-top: 8rem;
+}
+
+.containerInfo > h1{
+    font-size: 4rem;
+    background-image: radial-gradient(circle, #78c2ec, #5ea8da, #468dc7, #3173b3, #205a9e, #124e9a, #074295, #08358f, #0d3099, #1a2aa1, #2a21a9, #3b0faf);
+    background-clip: text; 
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent
+}
+
+.containerInfo > h2{
+    font-size: 3rem;
+}
+
+.containerInfo > p{
+    margin-top: 2rem;
+    font-weight: 400;
+}
+
+.containerImage{
+    transition: linear 3s;
+}
+
+.square1{
+    margin-top: 5rem;
+    width: 25rem;
+    height: 25rem;
+    border: 1px solid white;
+    border-radius: 16px;
+    position: absolute;
+    transform: rotate(45deg);
+}
+
+.square2{
+    margin-top: 5rem;
+    width: 25rem;
+    height: 25rem;
+    border: 1px solid white;
+    border-radius: 16px;
+    position: absolute;
+    transform: rotate(40deg);
+}
+
+.square3{
+    margin-top: 5rem;
+    width: 25rem;
+    height: 25rem;
+    border: 1px solid white;
+    border-radius: 16px;
+    position: absolute;
+    transform: rotate(43deg);
+}
+
+.imageBox{
+    position: unset;
+}
+
+.image{
+    object-fit: contain;
+    width: 90% !important;
+    position: relative !important;
+    height: unset !important;
+    margin-left: 0.8rem;
+    margin-top: 2rem;
+}
+
+.image:hover .square1{
+    transform: scale(1.2);
+}
