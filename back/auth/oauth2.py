@@ -1,9 +1,13 @@
 import base64
 from typing import List
+
+from fastapi import Depends, HTTPException, status
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
 from config.config import settings
+from schemas.serializers import user_serializer
+from config.mongo_db import collection_user
 
 
 class Settings(BaseModel):
@@ -22,3 +26,40 @@ class Settings(BaseModel):
 @AuthJWT.load_config
 def get_config():
     return Settings()
+
+# Protect private routes
+
+
+class NotVerified(Exception):
+    pass
+
+
+class UserNotFound(Exception):
+    pass
+
+def require_user(Authorize: AuthJWT = Depends()):
+    try:
+        Authorize.jwt_required()
+        user_id = Authorize.get_jwt_subject()  # Extract payload
+        user = user_serializer(collection_user.find_one({"_id": ObjectId(str(user_id))}))
+
+        if not user:
+            raise UserNotFound("User no longer exist")
+
+        if not user["verified"]:
+            raise NotVerified("You are not verified")
+
+    except Exception as e:
+        error = e.__class__.__name__
+        print(error)
+        if error == "MissingTokenError":
+            raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED,
+                                detail= "You are not logged in")
+        if error == "UserNotFound":
+            raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED,
+                                detail= "User no longer exist")
+        if error == "NotVerified":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail='Please verify your account')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token is invalid or has expired')
+    return user_id

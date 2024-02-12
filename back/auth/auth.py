@@ -10,20 +10,20 @@ from utils import utils
 from auth.oauth2 import AuthJWT
 from config.config import settings
 
-
 router = APIRouter()
 
 ACCESS_TOKEN_EXPIRES_IN = settings.ACCESS_TOKEN_EXPIRES_IN
 REFRESH_TOKEN_EXPIRES_IN = settings.REFRESH_TOKEN_EXPIRES_IN
 
-@router.post('/register', status_code=status.HTTP_201_CREATED, response_model= model.UserResponse)
+
+@router.post('/register', status_code=status.HTTP_201_CREATED, response_model=model.UserResponse)
 async def create_user(payload: model.CreateUserSchema):
     # Check if user already exist
 
     user = collection_user.find_one({'login': payload.login.lower()})
     if user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail= 'Account already exist')
+                            detail='Account already exist')
 
     if payload.password != payload.passwordConfirm:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -45,12 +45,12 @@ async def create_user(payload: model.CreateUserSchema):
 # LOGIN -------------------------------
 
 @router.post("/login")
-def login(payload: model.LoginUserSchema, response:Response, Authorize: AuthJWT = Depends()):
+def login(payload: model.LoginUserSchema, response: Response, Authorize: AuthJWT = Depends()):
     # Check if the user exist
     db_user = collection_user.find_one({'login': payload.name.lower()})
     if not db_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail= "Incorrect Login name or Password")
+                            detail="Incorrect Login name or Password")
 
     user = user_serializer(db_user)
 
@@ -61,11 +61,12 @@ def login(payload: model.LoginUserSchema, response:Response, Authorize: AuthJWT 
                             detail="Incorrect Login name or Password")
 
     # Create access token
-    access_token = Authorize.create_access_token(subject=str(user["_id"]), expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
-
+    access_token = Authorize.create_access_token(subject=str(user["_id"]),
+                                                 expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
 
     # Create refresh token
-    refresh_token = Authorize.create_refresh_token(subject=str(user["_id"]), expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
+    refresh_token = Authorize.create_refresh_token(subject=str(user["_id"]),
+                                                   expires_time=timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN))
 
     # Store refresh and access tokens in cookie
 
@@ -81,3 +82,13 @@ def login(payload: model.LoginUserSchema, response:Response, Authorize: AuthJWT 
     # Send both access
 
     return {"status": "success", "access_token": access_token}
+
+
+# LOGOUT --------------------------------
+
+@router.get('/logout', status_code=status.HTTP_200_OK)
+def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(oauth2.require_user())):
+    Authorize.unset_jwt_cookies()
+    response.set_cookie("logged_in", "", -1)
+
+    return {"status": "success"}

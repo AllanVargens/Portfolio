@@ -1,9 +1,12 @@
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Depends
 from bson import ObjectId
 
+import models.model
 from config.mongo_db import collection_user
 from schemas.serializers import users_serializer
-from models.model import User, Projects
+from models.model import User, Projects, UserResponseSchema
+
+from auth.oauth2 import require_user
 
 users_routes = APIRouter()
 
@@ -88,3 +91,9 @@ async def post_projects_in_user(user_id: str, project: Projects):
             "status": "okay",
             "data": result
         }
+
+
+@users_routes.get('/me', response_model=models.model.UserResponse)
+def get_me(user_id: str = Depends(require_user())):
+    user = UserResponseSchema(collection_user.find_one({"_id": ObjectId(str(user_id))}))
+    return {"status": "success", "user": user}
